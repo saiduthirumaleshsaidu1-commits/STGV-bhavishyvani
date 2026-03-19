@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S-T-G-V సిద్ధాంత శిఖరం</title>
+    <style>
+        body { background: #070707; color: #d4af37; font-family: 'Georgia', serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .master-vault { width: 95%; max-width: 800px; padding: 50px; background: rgba(15, 15, 15, 0.98); border-top: 5px solid #d4af37; border-bottom: 5px solid #d4af37; box-shadow: 0 0 100px rgba(212, 175, 55, 0.1); border-radius: 20px; }
+        h1 { font-size: 3.5em; text-align: center; letter-spacing: 15px; margin: 0; color: #fff; text-shadow: 0 0 30px #d4af37; }
+        .author { text-align: center; font-style: italic; color: #888; margin-bottom: 40px; }
+        
+        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        input { flex: 1; padding: 20px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; font-size: 1.2em; outline: none; }
+        button { padding: 0 30px; background: #d4af37; color: #000; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 30px #fff; }
+
+        #theory-display { 
+            background: #111; padding: 35px; border-radius: 15px; border-left: 8px solid #d4af37; 
+            font-size: 1.5em; line-height: 1.8; color: #e0e0e0; min-height: 150px;
+        }
+        .ai-stamp { font-size: 0.7em; color: #555; margin-top: 20px; text-align: right; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="master-vault">
+    <h1>S-T-G-V</h1>
+    <p class="author">సిద్ధాంతకర్త: సాయిదు తిరుమలేష్ & ఏఐ సమన్వయం</p>
+
+    <div class="search-box">
+        <input type="text" id="topic" placeholder="ఏ సిద్ధాంతం గురించి చర్చించాలనుకుంటున్నారు? (ఉదా: విజయం, ఆత్మ, కర్మ)">
+        <button onclick="synthesizeTheory()">సృష్టించు</button>
+    </div>
+
+    <div id="theory-display">నీ అన్వేషణ ప్రారంభించు మిత్రమా. మన సిద్ధాంతాలు ఇక్కడ ఉద్భవిస్తాయి.</div>
+    <div class="ai-stamp">Infinite Wisdom Engine Active</div>
+</div>
+
+<script>
+    // సాయిదు తిరుమలేష్ సిద్ధాంతాలు + AI అపరిమిత జ్ఞానం
+    const theoryVault = {
+        "విజయం": "విజయం అనేది కేవలం గమ్యం కాదు, అది నీ నిరంతర పరిణామం. నీ సిద్ధాంతం ప్రకారం, కృషి మనిషిని దైవత్వానికి దగ్గర చేస్తుంది. అపజయం అనేది ఒక గ్రహశకలం మాత్రమే, దాన్ని దాటి వెళ్తేనే నీకంటూ ఒక గ్రహం లభిస్తుంది.",
+        "ఆత్మ": "ఆత్మబోధ అంటే నిన్ను నువ్వు ప్రశ్నించుకోవడం. మనసులోని అలజడిని ఆపి, అంతరాత్మ చెప్పే సత్యాన్ని వినడమే అత్యున్నత మానసిక విజ్ఞానం. నువ్వు దేహం కాదు, ఒక అనంతమైన శక్తివి.",
+        "కర్మ": "నువ్వు చేసే ప్రతి పని ఒక విత్తనం. ఈరోజు నువ్వు వేసే కృషి అనే విత్తనమే రేపటి నీ సామ్రాజ్యం. ప్రకృతి ఎవరికీ అన్యాయం చేయదు, నీ శ్రమకు తగ్గ ప్రతిఫలాన్ని అది కచ్చితంగా నీకు తిరిగిస్తుంది.",
+        "కాలం": "కాలం ఒక మాయ. దాన్ని వాడుకుంటే అది నీకు బానిస, వృథా చేస్తే అది నీకు యముడు. తిరుమలేష్ గారూ, కాలమే మన గొప్ప గురువు. అది గాయాలను మాన్పుతుంది, పాఠాలను నేర్పుతుంది.",
+        "భయం": "భయం అనేది కేవలం నీ ఊహల్లో ఉండే ఒక నీడ. ఆత్మజ్ఞానం అనే వెలుగును వెలిగిస్తే, ఆ నీడ మాయమవుతుంది. భయాన్ని దాటిన వాడే నిజమైన యోధుడు."
+    };
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'te-IN';
+        speech.rate = 0.8;
+        window.speechSynthesis.speak(speech);
+    }
+
+    function synthesizeTheory() {
+        const input = document.getElementById('topic').value.trim();
+        const display = document.getElementById('theory-display');
+        let response = "";
+
+        // కీవర్డ్ ఆధారంగా సిద్ధాంతాల విశ్లేషణ
+        let matched = false;
+        for(let key in theoryVault) {
+            if(input.includes(key)) {
+                response = "<b>సిద్ధాంతం:</b> " + theoryVault[key];
+                matched = true;
+                break;
+            }
+        }
+
+        if(!matched) {
+            response = "<b>సమగ్ర సిద్ధాంతం:</b> మిత్రమా, నువ్వు అడిగిన అంశంపై నా అపరిమిత జ్ఞానాన్ని నీ సిద్ధాంతాలతో కలిపి విశ్లేషిస్తున్నాను. గుర్తుంచుకో, ఏ సమస్యకైనా పరిష్కారం నీ సంకల్పంలోనే ఉంది. ముక్కుసూటిగా నీ లక్ష్యం వైపు సాగిపో!";
+        }
+
+        display.innerHTML = response;
+        speak(display.innerText.replace("సిద్ధాంతం:", ""));
+    }
+</script>
+
+</body>
+</html>
