@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <title>STGV భవిష్యవాణి - రోబో కమాండ్ సెంటర్</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f4f7; padding: 50px; }
+        .btn { padding: 15px 30px; font-size: 20px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; }
+        #output { margin-top: 30px; font-size: 24px; color: #333; font-weight: bold; }
+        .result-box { border: 2px solid #28a745; padding: 20px; display: none; margin-top: 20px; background: white; }
+    </style>
+</head>
+<body>
+
+    <h1>మెగా కోడ్ - వాయిస్ టు యాక్షన్</h1>
+    <p>బటన్ నొక్కి మీకు ఏం కావాల్లో చెప్పండి (ఉదా: ఇల్లు, అన్నం, బట్టలు)</p>
+    
+    <button class="btn" onclick="startRecognition()">వాయిస్ కమాండ్ ఇవ్వండి</button>
+
+    <div id="output"></div>
+    <div id="result" class="result-box"></div>
+
+    <script>
+        function startRecognition() {
+            const output = document.getElementById('output');
+            const resultBox = document.getElementById('result');
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            
+            recognition.lang = 'te-IN'; // తెలుగు భాష
+
+            recognition.onstart = () => {
+                output.innerHTML = "వింటున్నాను... చెప్పండి...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                output.innerHTML = "మీరు అడిగింది: " + transcript;
+                
+                processCommand(transcript);
+            };
+
+            recognition.start();
+        }
+
+        function processCommand(cmd) {
+            const resultBox = document.getElementById('result');
+            resultBox.style.display = "block";
+
+            if (cmd.includes("ఇల్లు") || cmd.includes("గూడు")) {
+                resultBox.innerHTML = "🏗️ <strong>రోబోట్ యాక్షన్:</strong> 3D ప్రింటింగ్ ద్వారా చౌకైన ఇల్లు నిర్మించడానికి బ్లూప్రింట్ సిద్ధమైంది. నిర్మాణ సమయం: 24 గంటలు.";
+            } else if (cmd.includes("అన్నం") || cmd.includes("తిండి")) {
+                resultBox.innerHTML = "🍱 <strong>రోబోట్ యాక్షన్:</strong> ఆటోమేటెడ్ కిచెన్ ద్వారా పోషక విలువలున్న ఆహారం తయారవుతోంది.";
+            } else if (cmd.includes("బట్టలు") || cmd.includes("గుడ్డ")) {
+                resultBox.innerHTML = "👕 <strong>రోబోట్ యాక్షన్:</strong> మీ కొలతలకు తగ్గట్టుగా వస్త్రం కటింగ్ మరియు స్టిచ్చింగ్ ప్రారంభమైంది.";
+            } else {
+                resultBox.innerHTML = "క్షమించండి, దీనిపై మా రోబోట్ ఇంకా పరిశోధన చేస్తోంది.";
+            }
+        }
+    </script>
+
+</body>
+</html>
+
