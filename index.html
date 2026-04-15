@@ -2,62 +2,99 @@
 <html lang="te">
 <head>
     <meta charset="UTF-8">
-    <title>STGV భవిష్యవాణి - రోబో కమాండ్ సెంటర్</title>
+    <title>మెగా కోడ్ - 3D హౌస్ జనరేటర్</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f4f7; padding: 50px; }
-        .btn { padding: 15px 30px; font-size: 20px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; }
-        #output { margin-top: 30px; font-size: 24px; color: #333; font-weight: bold; }
-        .result-box { border: 2px solid #28a745; padding: 20px; display: none; margin-top: 20px; background: white; }
+        body { font-family: sans-serif; text-align: center; background-color: #f4f7f6; }
+        .controls { padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 300px; margin: 20px auto; }
+        .input-group { margin-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input { width: 90%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn { background-color: #28a745; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        
+        /* 3D కాన్వాస్ */
+        #3d-container { width: 100%; height: 500px; margin-top: 20px; border: 2px solid #ddd; }
     </style>
 </head>
 <body>
 
-    <h1>మెగా కోడ్ - వాయిస్ టు యాక్షన్</h1>
-    <p>బటన్ నొక్కి మీకు ఏం కావాల్లో చెప్పండి (ఉదా: ఇల్లు, అన్నం, బట్టలు)</p>
-    
-    <button class="btn" onclick="startRecognition()">వాయిస్ కమాండ్ ఇవ్వండి</button>
+    <h1>మెగా కోడ్ - 3D హౌస్ నమూనా</h1>
+    <p>స్థలం మరియు బడ్జెట్ వివరాలు ఇవ్వండి (ఉదా: 1000, 2, 500000)</p>
 
-    <div id="output"></div>
-    <div id="result" class="result-box"></div>
+    <div class="controls">
+        <div class="input-group">
+            <label>స్థలం కొలతలు (Sq. Ft):</label>
+            <input type="number" id="sqft" placeholder="ఉదా: 1000">
+        </div>
+        <div class="input-group">
+            <label>గదుల సంఖ్య (Rooms):</label>
+            <input type="number" id="rooms" placeholder="ఉదా: 2">
+        </div>
+        <div class="input-group">
+            <label>మీ బడ్జెట్ (రూపాయల్లో):</label>
+            <input type="number" id="budget" placeholder="ఉదా: 500000">
+        </div>
+        <button class="btn" onclick="generate3D()">3D నమూనా చూపించు</button>
+    </div>
+
+    <div id="3d-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        function startRecognition() {
-            const output = document.getElementById('output');
-            const resultBox = document.getElementById('result');
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            
-            recognition.lang = 'te-IN'; // తెలుగు భాష
+        // 3D సీన్, కెమెరా, మరియు రెండరర్ ని సిద్ధం చేయడం
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 500, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        
+        renderer.setSize(window.innerWidth, 500);
+        document.getElementById('3d-container').appendChild(renderer.domElement);
 
-            recognition.onstart = () => {
-                output.innerHTML = "వింటున్నాను... చెప్పండి...";
-            };
+        // లైటింగ్
+        const light = new THREE.AmbientLight(0x404040); // Ambient Light
+        scene.add(light);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                output.innerHTML = "మీరు అడిగింది: " + transcript;
-                
-                processCommand(transcript);
-            };
+        // 3D ఇల్లు నమూనా (ఒక బాక్స్)
+        const geometry = new THREE.BoxGeometry(1, 1, 1); // ప్రాథమిక సైజు
+        const material = new THREE.MeshStandardMaterial({ color: 0x88cc88 }); // బడ్జెట్ కి తగ్గట్టుగా కలర్
+        const houseMesh = new THREE.Mesh(geometry, material);
+        
+        scene.add(houseMesh);
+        camera.position.z = 5;
 
-            recognition.start();
+        // ఆనిమేషన్ ఫంక్షన్
+        function animate() {
+            requestAnimationFrame(animate);
+            houseMesh.rotation.y += 0.005; // మెల్లగా తిరిగేలా
+            renderer.render(scene, camera);
         }
+        animate();
 
-        function processCommand(cmd) {
-            const resultBox = document.getElementById('result');
-            resultBox.style.display = "block";
+        // 3D నమూనాను మార్చే ఫంక్షన్
+        function generate3D() {
+            const sqft = document.getElementById('sqft').value;
+            const rooms = document.getElementById('rooms').value;
+            const budget = document.getElementById('budget').value;
 
-            if (cmd.includes("ఇల్లు") || cmd.includes("గూడు")) {
-                resultBox.innerHTML = "🏗️ <strong>రోబోట్ యాక్షన్:</strong> 3D ప్రింటింగ్ ద్వారా చౌకైన ఇల్లు నిర్మించడానికి బ్లూప్రింట్ సిద్ధమైంది. నిర్మాణ సమయం: 24 గంటలు.";
-            } else if (cmd.includes("అన్నం") || cmd.includes("తిండి")) {
-                resultBox.innerHTML = "🍱 <strong>రోబోట్ యాక్షన్:</strong> ఆటోమేటెడ్ కిచెన్ ద్వారా పోషక విలువలున్న ఆహారం తయారవుతోంది.";
-            } else if (cmd.includes("బట్టలు") || cmd.includes("గుడ్డ")) {
-                resultBox.innerHTML = "👕 <strong>రోబోట్ యాక్షన్:</strong> మీ కొలతలకు తగ్గట్టుగా వస్త్రం కటింగ్ మరియు స్టిచ్చింగ్ ప్రారంభమైంది.";
+            if(!sqft || !rooms || !budget) { alert("దయచేసి వివరాలు ఇవ్వండి"); return; }
+
+            // స్థలం బట్టి 3D మోడల్ యొక్క సైజు ని మార్చడం
+            const size = Math.sqrt(sqft) / 10; // ఒక సింపుల్ స్కేలింగ్
+            houseMesh.scale.set(size, 1, size); // X, Y, Z అక్షరాల మీద స్కేల్
+
+            // బడ్జెట్ బట్టి కలర్ ని మార్చడం
+            if(budget < 300000) {
+                houseMesh.material.color.setHex(0xcc8888); // తక్కువ బడ్జెట్ కి ఎరుపు కలర్
             } else {
-                resultBox.innerHTML = "క్షమించండి, దీనిపై మా రోబోట్ ఇంకా పరిశోధన చేస్తోంది.";
+                houseMesh.material.color.setHex(0x88cc88); // మంచి బడ్జెట్ కి ఆకుపచ్చ కలర్
             }
         }
+    }
     </script>
 
 </body>
 </html>
+
 
