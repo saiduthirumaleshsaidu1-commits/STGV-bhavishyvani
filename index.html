@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STGV Pro - విశ్వ నేత్ర & Gemini</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <style>
+        :root { --neon: #00d2ff; --warn: #ff4500; --space: #00050a; --gemini: #8e75ff; }
+        body { margin: 0; background: var(--space); color: white; font-family: 'Segoe UI', sans-serif; }
+        
+        /* కంటైనర్ స్క్రోలింగ్ కోసం */
+        .main-container { height: 100vh; overflow-y: auto; scroll-behavior: smooth; }
+
+        .page { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .hidden { display: none; }
+        
+        .header { padding: 15px; text-align: center; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 100; }
+        #v-wrap { position: relative; height: 300px; border: 2px solid var(--neon); margin: 10px; border-radius: 20px; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--neon); animation: scan 3s linear infinite; }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+        .btn-group { display: flex; justify-content: space-around; padding: 15px; background: #000; gap: 10px; }
+        .btn { border: 2px solid var(--neon); color: var(--neon); padding: 12px; border-radius: 30px; background: none; cursor: pointer; font-weight: bold; flex: 1; font-size: 0.8em; }
+        .btn-gemini { border-color: var(--gemini); color: var(--gemini); }
+
+        /* AI లాజిక్ సెంటర్ స్టైల్ */
+        .logic-center { padding: 30px 15px; background: linear-gradient(180deg, #000 0%, #001a33 100%); text-align: center; }
+        .logic-card { background: rgba(255,255,255,0.05); border: 1px solid #334155; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+
+        /* భవిష్యవాణి UI */
+        #p2 { background: radial-gradient(circle at center, #001a33 0%, #000 100%); text-align: center; padding: 50px 20px; }
+        .sun-hd { width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, #fff, #ff4500); margin: 20px auto; box-shadow: 0 0 50px #ff4500; animation: glow 4s infinite; }
+        @keyframes glow { 50% { box-shadow: 0 0 100px #ffcc00; transform: scale(1.1); } }
+    </style>
+</head>
+<body onclick="initApp()">
+
+    <div class="main-container">
+        <div id="p1" class="page">
+            <div class="header">
+                <h2 style="margin:0; color:var(--neon);">STGV విశ్వ నేత్ర Pro</h2>
+                <div id="ai-status" style="font-size: 0.8em;">ప్రారంభించడానికి తాకండి</div>
+            </div>
+
+            <div id="v-wrap">
+                <video id="cam" autoplay playsinline muted></video>
+                <div class="scanner-line"></div>
+            </div>
+
+            <div id="obj-label" style="text-align:center; padding: 15px; background: rgba(0,210,255,0.1); color: var(--neon); font-weight: bold;">గమనిస్తున్నాను...</div>
+
+            <div class="btn-group">
+                <button class="btn btn-gemini" onclick="openGemini()">AI సాయం</button>
+                <button class="btn" onclick="toFuture()">భవిష్యవాణి</button>
+            </div>
+
+            <div class="logic-center">
+                <h2 style="color: #38bdf8;">మెగా AI లాజిక్ సెంటర్</h2>
+                <div class="logic-card">
+                    <h4 style="color: #fbbf24; margin: 5px;">దశ 1: కళ్లు (Input)</h4>
+                    <p style="font-size: 0.8em; color: #94a3b8;">కెమెరా ద్వారా సెకనుకు 30 ఫ్రేమ్స్ విశ్లేషణ.</p>
+                </div>
+                <div class="logic-card" style="border-top: 3px solid var(--neon);">
+                    <h4 style="color: var(--neon); margin: 5px;">దశ 2: మెదడు (Logic)</h4>
+                    <p style="font-size: 0.8em; color: #94a3b8;">TensorFlow AI ద్వారా వస్తువుల గుర్తింపు.</p>
+                </div>
+                
+                <a href="https://www.youtube.com/@STGV_TECH" target="_blank" style="text-decoration:none;">
+                    <button class="btn" style="background: #FF0000; color: white; border: none; width: 100%; margin-top: 10px;">
+                        YouTube లో సబ్‌స్క్రైబ్ చేయండి 🔔
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <div id="p2" class="page hidden">
+            <h1 style="color:var(--neon);">STGV భవిష్యవాణి</h1>
+            <div class="sun-hd" onclick="getFuture()"></div>
+            <div id="f-msg" style="padding:20px; border:1px solid var(--neon); border-radius:15px; background:rgba(0,0,0,0.5);">సూర్యుడిని తాకి కాలజ్ఞానం విను...</div>
+            <button class="btn" onclick="location.reload()" style="margin-top:30px; max-width: 200px; align-self: center;">మళ్ళీ మొదటికి</button>
+        </div>
+    </div>
+
+    <script>
+        let model, video, synth = window.speechSynthesis, active = false;
+
+        async function initApp() {
+            if(active) return; active = true;
+            video = document.getElementById('cam');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+                document.getElementById('ai-status').innerText = "AI ఇంజిన్ లోడ్ అవుతోంది...";
+                model = await cocoSsd.load();
+                document.getElementById('ai-status').innerText = "సిద్ధంగా ఉంది";
+                speak("విశ్వ నేత్ర మరియు జెమిని కనెక్ట్ అయ్యాయి.");
+                process();
+            } catch(e) { document.getElementById('ai-status').innerText = "కెమెరా ఎర్రర్"; }
+        }
+
+        async function process() {
+            if(!document.getElementById('p2').classList.contains('hidden')) return;
+            const res = await model.detect(video);
+            if(res.length > 0) {
+                let name = res[0].class;
+                let translations = { 'person': 'మనిషి', 'chair': 'కుర్చీ', 'bottle': 'బాటిల్', 'cell phone': 'ఫోన్' };
+                let tel = translations[name] || name;
+                document.getElementById('obj-label').innerText = tel + " గుర్తించాను";
+                speak(tel);
+            }
+            setTimeout(process, 4000); 
+        }
+
+        function openGemini() {
+            speak("జెమిని ఓపెన్ అవుతోంది");
+            window.location.href = "intent://#Intent;scheme=googleassistant;package=com.google.android.apps.bard;end";
+        }
+
+        function toFuture() { 
+            document.getElementById('p1').classList.add('hidden'); 
+            document.getElementById('p2').classList.remove('hidden'); 
+            speak("కాల చక్రంలోకి స్వాగతం");
+        }
+
+        function getFuture() {
+            const msgs = ["విజయం నీదే", "ధైర్యంగా ముందుకు సాగు", "శుభవార్త వింటావు"];
+            let msg = msgs[Math.floor(Math.random()*msgs.length)];
+            document.getElementById('f-msg').innerText = msg;
+            speak(msg);
+        }
+
+        function speak(t) {
+            if(synth.speaking) return;
+            let u = new SpeechSynthesisUtterance(t); u.lang = 'te-IN';
+            synth.speak(u);
+        }
+    </script>
+</body>
+</html>
