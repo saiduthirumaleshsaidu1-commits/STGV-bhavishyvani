@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <title>మెగా కోడ్ - 3D హౌస్ & STGV కాలజ్ఞానం</title>
+    <style>
+        /* మొత్తం పేజీ స్టైలింగ్ */
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #00050a; color: white; margin: 0; padding: 20px; }
+        h1 { color: #ffd700; margin-top: 20px; }
+        
+        /* 1. 3D హౌస్ కంట్రోల్స్ */
+        .house-section { padding: 20px; background: #111; border-radius: 15px; border: 1px solid #333; width: 350px; margin: 20px auto; }
+        .input-group { margin-bottom: 12px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #00ff88; }
+        input { width: 90%; padding: 10px; border: 1px solid #444; background: #222; color: white; border-radius: 5px; }
+        .btn-green { background-color: #28a745; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        #3d-container { width: 100%; height: 400px; margin-top: 20px; background: #000; border: 1px dashed #444; }
+
+        /* 2. STGV కాలజ్ఞానం (హబ్) స్టైల్స్ */
+        .kalagnanam-hub { margin-top: 60px; padding: 40px 20px; background: rgba(255, 215, 0, 0.03); border-radius: 20px; border-top: 2px solid #ffd700; }
+        .display-card {
+            background: #111;
+            border: 1.5px solid #ffd700;
+            border-left: 10px solid #00ff88;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .badge { background: #00ff88; color: black; padding: 4px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; position: absolute; top: -15px; left: 20px; }
+        .verse { font-size: 1.5rem; color: #fff; margin: 15px 0; line-height: 1.6; }
+        .meaning { color: #aaa; font-style: italic; border-top: 1px solid #333; padding-top: 15px; font-size: 1.1rem; }
+        .footer-info { color: #00d2ff; font-family: monospace; font-size: 0.7rem; margin-top: 25px; display: block; text-align: right; }
+        .nav-button { background: none; border: 1.5px solid #ffd700; color: #ffd700; padding: 10px 25px; border-radius: 30px; cursor: pointer; margin: 10px; font-weight: bold; }
+        .nav-button:hover { background: #ffd700; color: #000; }
+    </style>
+</head>
+<body>
+
+    <h1>మెగా కోడ్ (Mega Code)</h1>
+    <p style="color: #888;">3D హౌస్ డిజైన్ & ప్రాచీన భవిష్యవాణి ఒకే చోట</p>
+
+    <div class="house-section">
+        <div class="input-group">
+            <label>స్థలం (Sq. Ft):</label>
+            <input type="number" id="sqft" placeholder="ఉదా: 1200">
+        </div>
+        <div class="input-group">
+            <label>బడ్జెట్ (రూపాయల్లో):</label>
+            <input type="number" id="budget" placeholder="ఉదా: 800000">
+        </div>
+        <button class="btn-green" onclick="generateHouse()">3D మోడల్ అప్‌డేట్</button>
+    </div>
+
+    <div id="3d-container"></div>
+
+    <div class="kalagnanam-hub">
+        <h2 style="color: #ffd700;">STGV భవిష్యవాణి - డిజిటల్ ఆర్కైవ్</h2>
+        <div class="display-card">
+            <span id="label" class="badge">లోడ్ అవుతోంది...</span>
+            <div id="main-verse" class="verse">సమాచారం సిద్ధమవుతోంది...</div>
+            <div id="main-meaning" class="meaning"></div>
+            <span id="seal" class="footer-info"></span>
+        </div>
+        <div style="margin-top: 20px;">
+            <button class="nav-button" onclick="change( -1 )">← గత పద్యం</button>
+            <button class="nav-button" onclick="change( 1 )">తదుపరి పద్యం →</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- 1. 3D హౌస్ స్క్రిప్ట్ ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth > 800 ? 800 : window.innerWidth, 400);
+        document.getElementById('3d-container').appendChild(renderer.domElement);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5), light);
+
+        const house = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0x00ff88 }));
+        scene.add(house);
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            house.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        function generateHouse() {
+            const s = document.getElementById('sqft').value;
+            const b = document.getElementById('budget').value;
+            if(s) {
+                let scale = Math.sqrt(s)/15;
+                house.scale.set(scale, scale/1.5, scale);
+                house.material.color.setHex(b < 500000 ? 0xff4444 : 0x00ff88);
+            }
+        }
+
+        // --- 2. కాలజ్ఞాన డేటా & లాజిక్ ---
+        const data = [
+            { "c": "ప్రకృతి", "v": "వేప చెట్టుకు పాలధారలు కారును, వింతలు విశేషాలు వింతగా జరుగును.", "m": "ప్రకృతిలో అసాధారణ మార్పులు సంభవిస్తాయని సూచన.", "h": "STGV-H-001" },
+            { "c": "సామాజికం", "v": "పట్టణములన్నీ పల్లెలు అవుతాయి, పల్లెలే పట్టణాలవుతాయి.", "m": "నగరీకరణ వల్ల జరిగే సామాజిక మార్పులు.", "h": "STGV-H-002" },
+            { "c": "వైద్యం", "v": "కొత్త వింత రోగములు వచ్చును, మందులు లేని జబ్బులు వ్యాపించును.", "m": "మహమ్మారి వ్యాధుల గురించి ముందస్తు హెచ్చరిక.", "h": "STGV-H-014" },
+            { "c": "ఆధ్యాత్మికం", "v": "కాశీ పట్టణము ముప్పాతిక వంతు కలిసిపోవును, గంగానది ఇంకిపోవును.", "m": "పుణ్యక్షేత్రాల మార్పుల గురించి హెచ్చరిక.", "h": "STGV-H-003" }
+        ];
+
+        let idx = 0;
+
+        function refresh() {
+            const item = data[idx];
+            document.getElementById('label').innerText = item.c;
+            document.getElementById('main-verse').innerText = item.v;
+            document.getElementById('main-meaning').innerText = item.m;
+            document.getElementById('seal').innerText = "VERIFIED HASH: " + item.h;
+
+            // వాయిస్
+            window.speechSynthesis.cancel();
+            let msg = new SpeechSynthesisUtterance(item.v);
+            msg.lang = 'te-IN';
+            window.speechSynthesis.speak(msg);
+        }
+
+        function change(n) {
+            idx = (idx + n + data.length) % data.length;
+            refresh();
+        }
+
+        window.onload = refresh;
+    </script>
+</body>
+</html>
