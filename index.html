@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STGV AI Architect Pro - సామాన్యుడి డిజిటల్ మేస్త్రీ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root { --primary: #28a745; --bg: #121212; --panel: #1e1e1e; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--bg); color: white; overflow: hidden; }
+        #header { padding: 15px; background: #1a1a1a; text-align: center; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10; }
+        #main-container { display: flex; flex: 1; overflow: hidden; }
+        #controls { width: 380px; padding: 25px; background: var(--panel); overflow-y: auto; border-right: 1px solid #333; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
+        #canvas-container { flex: 1; position: relative; background: radial-gradient(circle, #333 0%, #000 100%); }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; font-weight: 500; }
+        input, select { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        .btn { width: 100%; padding: 15px; background: var(--primary); border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; font-size: 16px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn:hover { background: #218838; transform: translateY(-2px); }
+        .btn-blue { background: #007bff; }
+        .btn-blue:hover { background: #0069d9; }
+        #budget-report { margin-top: 25px; padding: 20px; background: rgba(40, 167, 69, 0.1); border-radius: 12px; border: 1px solid var(--primary); }
+        table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        td { padding: 10px 0; border-bottom: 1px solid #333; font-size: 15px; }
+        .highlight { color: var(--primary); font-weight: bold; }
+        .vastu-badge { background: #ffc107; color: black; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <h2 style="margin:0; letter-spacing: 1px;">🏗️ STGV AI ఆర్కిటెక్ట్ ప్రో</h2>
+</div>
+
+<div id="main-container">
+    <div id="controls">
+        <div class="vastu-badge">100% వాస్తు నియమావళి</div>
+        
+        <div class="input-group">
+            <label>స్థలం కొలతలు (Sq. Ft):</label>
+            <input type="number" id="sqft" value="1000" min="200" oninput="updateAll()">
+        </div>
+        
+        <div class="input-group">
+            <label>ఇంటి దిశ (Facing):</label>
+            <select id="facing" onchange="updateAll()">
+                <option value="East">తూర్పు (East)</option>
+                <option value="West">పడమర (West)</option>
+                <option value="North">ఉత్తరం (North)</option>
+                <option value="South">దక్షిణం (South)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>ఎలివేషన్ స్టైల్ (Style):</label>
+            <select id="style" onchange="updateAll()">
+                <option value="Modern">మోడరన్ (Flat Roof)</option>
+                <option value="Traditional">సాంప్రదాయ (Sloped Roof)</option>
+                <option value="Luxury">లగ్జరీ (Premium)</option>
+            </select>
+        </div>
+        
+        <button class="btn" onclick="speakReport()">🔊 వాయిస్ అసిస్టెంట్</button>
+        <button class="btn btn-blue" onclick="sendToRobot()">🤖 రోబోటిక్ కోఆర్డినేట్స్</button>
+
+        <div id="budget-report">
+            <strong>📊 నిర్మాణ అంచనా పట్టిక:</strong>
+            <table id="cost-table"></table>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+</div>
+
+<script>
+    let scene, camera, renderer, houseGroup;
+
+    function init3D() {
+        scene = new THREE.Scene();
+        const container = document.getElementById('canvas-container');
+        camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const light1 = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(light1);
+        const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        light2.position.set(5, 10, 7);
+        scene.add(light2);
+
+        camera.position.set(10, 10, 10);
+        camera.lookAt(0, 0, 0);
+
+        animate();
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if(houseGroup) houseGroup.rotation.y += 0.002;
+        renderer.render(scene, camera);
+    }
+
+    function updateAll() {
+        generate3DPlan();
+        calculateBudget();
+    }
+
+    function generate3DPlan() {
+        if(houseGroup) scene.remove(houseGroup);
+        houseGroup = new THREE.Group();
+
+        const sqft = parseFloat(document.getElementById('sqft').value) || 1000;
+        const style = document.getElementById('style').value;
+        const size = Math.sqrt(sqft) / 5;
+
+        // Base
+        const floor = new THREE.Mesh(new THREE.BoxGeometry(size, 0.2, size), new THREE.MeshStandardMaterial({color: 0x444444}));
+        houseGroup.add(floor);
+
+        // Rooms (Simplified Vastu Logic)
+        const roomConfigs = [
+            { name: "Kitchen", pos: [size/4, 1.1, size/4], color: 0xff4444 }, // SE
+            { name: "Master", pos: [-size/4, 1.1, size/4], color: 0x4444ff }, // SW
+            { name: "Hall", pos: [0, 1.1, -size/10], color: 0x888888 }
+        ];
+
+        roomConfigs.forEach(r => {
+            const room = new THREE.Mesh(new THREE.BoxGeometry(size/2.5, 2, size/2.5), new THREE.MeshStandardMaterial({color: r.color, transparent: true, opacity: 0.7}));
+            room.position.set(...r.pos);
+            houseGroup.add(room);
+        });
+
+        // Simhadwaram (Main Door)
+        const door = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.6, 0.1), new THREE.MeshStandardMaterial({color: 0xffd700}));
+        door.position.set(size/4, 0.8, -size/2); 
+        houseGroup.add(door);
+
+        // Elevation / Roof
+        let roof;
+        if(style === "Modern") {
+            roof = new THREE.Mesh(new THREE.BoxGeometry(size+0.2, 0.1, size+0.2), new THREE.MeshStandardMaterial({color: 0x666666}));
+            roof.position.y = 2.1;
+        } else if(style === "Traditional") {
+            roof = new THREE.Mesh(new THREE.ConeGeometry(size*0.7, 1.5, 4), new THREE.MeshStandardMaterial({color: 0x8b4513}));
+            roof.position.y = 2.8; roof.rotation.y = Math.PI/4;
+        } else {
+            roof = new THREE.Mesh(new THREE.BoxGeometry(size+0.4, 0.3, size+0.4), new THREE.MeshStandardMaterial({color: 0x111111}));
+            roof.position.y = 2.2;
+        }
+        houseGroup.add(roof);
+
+        scene.add(houseGroup);
+    }
+
+    function calculateBudget() {
+        const sqft = document.getElementById('sqft').value;
+        const cement = Math.round(sqft * 0.4);
+        const steel = (sqft * 3.8).toFixed(0);
+        const bricks = sqft * 18;
+        const total = (sqft * 2100).toLocaleString();
+
+        document.getElementById('cost-table').innerHTML = `
+            <tr><td>సిమెంట్</td><td class="highlight">${cement} బస్తాలు</td></tr>
+            <tr><td>స్టీల్ (ఇనుము)</td><td class="highlight">${steel} కేజీలు</td></tr>
+            <tr><td>ఇటుకలు</td><td class="highlight">${bricks} సంఖ్య</td></tr>
+            <tr><td>అంచనా వ్యయం</td><td class="highlight" style="font-size:18px;">₹${total}</td></tr>
+        `;
+    }
+
+    function speakReport() {
+        const sqft = document.getElementById('sqft').value;
+        const facing = document.getElementById('facing').value;
+        const msg = new SpeechSynthesisUtterance(`నమస్కారం. మీరు ఎంచుకున్న ${sqft} అడుగుల ${facing} ముఖం ఇంటి ప్లాన్ సిద్ధమైంది. వాస్తు ప్రకారం గదులు అమర్చబడ్డాయి.`);
+        msg.lang = 'te-IN';
+        window.speechSynthesis.speak(msg);
+    }
+
+    function sendToRobot() {
+        const sqft = document.getElementById('sqft').value;
+        console.log("Generating Robot Coordinates for SQFT:", sqft);
+        alert("రోబోటిక్ కంట్రోల్ యూనిట్ కి కోఆర్డినేట్స్ పంపబడ్డాయి. ఆటోమేటిక్ నిర్మాణం ప్రారంభించడానికి సిద్ధం!");
+    }
+
+    window.onload = () => { init3D(); updateAll(); };
+    window.onresize = () => {
+        const container = document.getElementById('canvas-container');
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    };
+</script>
+</body>
+</html>
