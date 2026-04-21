@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>పొదుపు సంఘం - అడ్వాన్స్‌డ్ వాయిస్ క్యాలిక్యులేటర్</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1b5e20; border-bottom: 2px solid #ffca28; padding-bottom: 10px; }
+        .settings-panel { display: flex; flex-wrap: wrap; gap: 15px; background: #e8f5e9; padding: 20px; border-radius: 10px; margin-bottom: 20px; justify-content: center; border: 1px solid #c8e6c9; }
+        .setting-item { display: flex; flex-direction: column; font-weight: bold; color: #2e7d32; }
+        .setting-item input { padding: 8px; border-radius: 5px; border: 1px solid #aaa; margin-top: 5px; width: 120px; }
+        .member-row { border: 1px solid #e0e0e0; margin-bottom: 15px; padding: 15px; border-radius: 10px; background: #fff; }
+        .grid { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+        .m-box { font-size: 10px; text-align: center; background: #f1f8e9; padding: 5px; border-radius: 3px; border: 1px solid #c8e6c9; width: 35px; }
+        .btn-voice { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px; }
+        .info-txt { color: #1b5e20; font-weight: bold; margin-top: 5px; background: #fffde7; padding: 10px; border-radius: 5px; display: none; line-height: 1.6; border: 1px solid #ffe082; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>పొదుపు సంఘం - వాయిస్ వడ్డీ రిపోర్టర్</h2>
+
+    <div class="settings-panel">
+        <div class="setting-item">అసలు లోన్ (₹): <input type="number" id="globalLoan" value="100000"></div>
+        <div class="setting-item">వడ్డీ శాతం (%): <input type="number" id="globalRate" value="7" step="0.1"></div>
+        <div class="setting-item">మొత్తం వాయిదాలు: <input type="number" id="globalMonths" value="22"></div>
+        <div style="align-self: flex-end;">
+            <button onclick="updateDisplay()" style="padding: 10px; background: #ffca28; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">సెట్టింగ్స్ అప్డేట్</button>
+        </div>
+    </div>
+
+    <div id="membersContainer"></div>
+</div>
+
+<script>
+    const memberNames = ["సభ్యుడు 1", "సభ్యుడు 2", "సభ్యుడు 3", "సభ్యుడు 4", "సభ్యుడు 5", "సభ్యుడు 6", "సభ్యుడు 7", "సభ్యుడు 8", "సభ్యుడు 9", "సభ్యుడు 10"];
+    const container = document.getElementById('membersContainer');
+
+    function updateDisplay() {
+        container.innerHTML = "";
+        let totalMonths = parseInt(document.getElementById('globalMonths').value);
+        
+        memberNames.forEach((name, idx) => {
+            let mId = idx + 1;
+            let html = `
+                <div class="member-row">
+                    <b>సభ్యుని పేరు:</b> <input type="text" id="name${mId}" value="${name}" style="border:none; border-bottom:1px solid #ccc; font-weight:bold; color:#1b5e20; font-size:16px;">
+                    <p style="font-size:12px; color:gray;">(వాయిదా కట్టిన నెలలను టిక్ చేయండి. మిస్ అయితే అన్-టిక్ చేయండి)</p>
+                    <div class="grid">`;
+            for (let month = 1; month <= totalMonths; month++) {
+                html += `<div class="m-box">${month}<br><input type="checkbox" id="m${mId}_${month}" checked></div>`;
+            }
+            html += `</div>
+                    <button class="btn-voice" onclick="calculateAndSpeak(${mId})">${name} లెక్క వినిపించు 🔊</button>
+                    <div id="status${mId}" class="info-txt"></div>
+                </div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    updateDisplay();
+
+    function calculateAndSpeak(id) {
+        let name = document.getElementById('name' + id).value;
+        let loan = parseFloat(document.getElementById('globalLoan').value);
+        let annualRate = parseFloat(document.getElementById('globalRate').value);
+        let totalMonths = parseInt(document.getElementById('globalMonths').value);
+        
+        let monthlyRate = (annualRate/100)/12;
+        let principalEMI = loan / totalMonths;
+        let currentBal = loan;
+        let totalInt = 0;
+        let missedCount = 0;
+        let missedList = [];
+
+        for (let m = 1; m <= totalMonths; m++) {
+            let isPaid = document.getElementById(`m${id}_${m}`).checked;
+            totalInt += (currentBal * monthlyRate);
+
+            if (isPaid) {
+                let payingNow = 1 + missedCount; 
+                currentBal -= (principalEMI * payingNow);
+                missedCount = 0; 
+            } else {
+                missedCount++;
+                missedList.push(m);
+            }
+        }
+
+        currentBal = Math.max(0, currentBal);
+        let totalAmt = Math.round(loan + totalInt);
+        let roundInt = Math.round(totalInt);
+
+        let statusDiv = document.getElementById('status' + id);
+        statusDiv.style.display = "block";
+        statusDiv.innerHTML = `<b>రిపోర్ట్:</b><br>అసలు: ₹${loan.toLocaleString()} | మొత్తం వడ్డీ: ₹${roundInt.toLocaleString()}<br><b>మొత్తం చెల్లించాల్సింది: ₹${totalAmt.toLocaleString()}</b>`;
+
+        let speechMsg = `నమస్కారం ${name} గారు. మీ అప్పు వివరాలు ఇవి. `;
+        speechMsg += `మీ అసలు లక్ష రూపాయలకు, వడ్డీ ${roundInt} రూపాయలు అయినది. `;
+        if(missedList.length > 0) {
+            speechMsg += `మీరు కొన్ని నెలలు వాయిదాలు ఆలస్యంగా కట్టడం వల్ల వడ్డీ పెరిగింది. `;
+        }
+        speechMsg += `వడ్డీతో కలిపి మీరు మొత్తం ${totalAmt} రూపాయలు చెల్లించాలి. ధన్యవాదాలు.`;
+
+        let speech = new SpeechSynthesisUtterance(speechMsg);
+        speech.lang = 'te-IN';
+        speech.rate = 0.9;
+        window.speechSynthesis.cancel(); // పాత వాయిస్ ఆపి కొత్తది ప్లే చేస్తుంది
+        window.speechSynthesis.speak(speech);
+    }
+</script>
+
+</body>
+</html>
