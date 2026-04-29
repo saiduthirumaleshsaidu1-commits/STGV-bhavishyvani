@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>జ్ఞాన భాండాగారం | బ్రహ్మంగారి జ్ఞానం vs సైన్స్</title>
+    <style>
+        :root {
+            --ancient-gold: #d4af37;
+            --spiritual-orange: #ff8c00;
+            --science-blue: #00d2ff;
+            --dark-bg: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--ancient-gold);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            border-radius: 25px;
+            border: 2px solid var(--ancient-gold);
+            background: #333;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 25px;
+            background: var(--spiritual-orange);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .display-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .box {
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 250px;
+            transition: transform 0.3s;
+        }
+
+        .ancient-box {
+            background: #fdf5e6;
+            color: #5d4037;
+            border-left: 10px solid var(--spiritual-orange);
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .science-box {
+            background: #0f2027;
+            color: var(--science-blue);
+            border-right: 10px solid var(--science-blue);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        h2 { margin-top: 0; border-bottom: 1px dashed; }
+
+        @media (max-width: 768px) {
+            .display-area { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>శ్రీ వీరబ్రహ్మేంద్రస్వామి కాలజ్ఞాన - విజ్ఞాన వేదిక</h1>
+    <p>పురాతన సూక్తులు - ఆధునిక శాస్త్రాల తర్క విశ్లేషణ</p>
+</div>
+
+<div class="search-container">
+    <input type="text" id="query" placeholder="ప్రకృతి, టెక్నాలజీ, జీవితం, సమాజం, ఆహారం గురించి అడగండి...">
+    <button onclick="analyze()">అన్వేషించు</button>
+</div>
+
+<div class="display-area">
+    <div class="box ancient-box" id="ancient-result">
+        <h2>బ్రహ్మంగారి కాలజ్ఞానం</h2>
+        <p id="brahmam-text">నాయనా, నీ సందేహాన్ని అడుగు. కాలచక్రంలోని రహస్యాలను వివరిస్తాను.</p>
+    </div>
+
+    <div class="box science-box" id="science-result">
+        <h2>శాస్త్రీయ విశ్లేషణ</h2>
+        <p id="science-text">మిత్రమా, నీ ప్రశ్నకు ఆధునిక విజ్ఞాన శాస్త్రం ఇచ్చే ఆధారాలను ఇక్కడ చూడవచ్చు.</p>
+    </div>
+</div>
+
+<script>
+    const database = {
+        "nature": {
+            keywords: ["ప్రకృతి", "వాన", "వరద", "భూమి", "గాలి", "పర్యావరణం"],
+            brahmam: "నాయనా, పంచభూతాలు తమ సహజ స్థితిని కోల్పోతాయి. అకాల వర్షాలు, భూకంపాలు సంభవిస్తాయి. మనిషి స్వార్థం వల్ల ప్రకృతి ప్రకోపిస్తుంది.",
+            science: "దీనిని 'Climate Change' అంటారు. గ్రీన్ హౌస్ వాయువుల వల్ల ఉష్ణోగ్రతలు పెరిగి, సముద్ర మట్టాలు మరియు వాతావరణ మార్పులు సంభవిస్తున్నాయి."
+        },
+        "tech": {
+            keywords: ["టెక్నాలజీ", "రోబో", "ఫోన్", "యంత్రం", "కంప్యూటర్", "ఏఐ"],
+            brahmam: "ప్రాణం లేని యంత్రాలు మాట్లాడతాయి. మనిషి చేసే పనిని లోహపు విగ్రహాలు చేస్తాయి. దూరాన ఉన్నవారు ముఖాముఖి మాట్లాడుకుంటారు.",
+            science: "ఇది AI మరియు Telecommunication విప్లవం. సిలికాన్ చిప్స్, శాటిలైట్స్ మరియు అల్గారిథమ్స్ ద్వారా సమాచార మార్పిడి వేగంగా జరుగుతోంది."
+        },
+        "life": {
+            keywords: ["జీవితం", "చావు", "పుట్టుక", "కష్టం", "సుఖం", "కర్మ"],
+            brahmam: "జనన మరణాలు కాలచక్రం లోని భాగాలు. కర్మ ఫలాన్ని అనుభవించక తప్పదు. నిన్ను నీవు తెలుసుకోవడమే ముక్తి మార్గం.",
+            science: "బయోలజీ ప్రకారం జీవం అనేది కణాల శక్తి మార్పిడి (Metabolism). పరిణామ క్రమంలో మనిషి తన ఉనికిని కాపాడుకోవడానికి చేసే ప్రయత్నమే జీవితం."
+        },
+        "society": {
+            keywords: ["సమాజం", "మనిషి", "ప్రజలు", "నీతి", "విలువలు", "సంబంధాలు"],
+            brahmam: "కలియుగంలో ధర్మం ఒంటిపాదంపై నడుస్తుంది. మనుషుల మధ్య నమ్మకం తగ్గుతుంది. డబ్బుకే లోకం దాసోహం అంటుంది.",
+            science: "దీనిని సామాజిక పరిణామం (Social Evolution) అంటారు. ఆర్థిక వ్యవస్థలు మరియు పట్టణీకరణ వల్ల మానవ సంబంధాల తీరు మారుతోంది."
+        },
+        "food": {
+            keywords: ["ఆహారం", "అన్నం", "తిండి", "ఆరోగ్యం", "వ్యాధులు"],
+            brahmam: "కృత్రిమ ఆహారం విషతుల్యం అవుతుంది. రుచుల కోసం మనిషి ఆయుష్షును తగ్గించుకుంటాడు. వింత రోగాలు ప్రబలుతాయి.",
+            science: "Processed Foods మరియు రసాయనాల వాడకం వల్ల డయాబెటిస్, క్యాన్సర్ వంటి వ్యాధులు పెరుగుతున్నాయి. పోషకాహార లోపం ప్రధాన సమస్య."
+        }
+    };
+
+    function analyze() {
+        const query = document.getElementById("query").value.toLowerCase();
+        const bText = document.getElementById("brahmam-text");
+        const sText = document.getElementById("science-text");
+
+        let found = false;
+
+        for (let category in database) {
+            const item = database[category];
+            if (item.keywords.some(k => query.includes(k))) {
+                bText.innerText = item.brahmam;
+                sText.innerText = item.science;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            bText.innerText = "నాయనా, నీవు అడిగిన విషయం గురించి ప్రస్తుత తాళపత్రాల్లో సమాచారం లేదు. మరోలా ప్రయత్నించు.";
+            sText.innerText = "ఈ కీవర్డ్ మా డేటాబేస్‌లో లేదు. దయచేసి ప్రకృతి, టెక్నాలజీ వంటి పదాలను వాడండి.";
+        }
+    }
+</script>
+
+</body>
+</html>
